@@ -2,8 +2,7 @@
 
 Official repository for the paper:
 
-> **Execution Trace Reconstruction Using Diffusion-Based Generative Models**  
-> *Accepted at ICSE 2025 (extended with additional experiments for IEEE Transactions / EMSE)*
+> **Leveraging Diffusion Models for Execution Trace Reconstruction**  
 
 We introduce a novel application of diffusion-based generative models for reconstructing masked portions of execution traces (system call sequences and microservice call graphs), conduct a thorough evaluation across 12+ datasets, and compare against transformer and RNN baselines.
 
