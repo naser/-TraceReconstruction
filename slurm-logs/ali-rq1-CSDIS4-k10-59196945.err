@@ -1,0 +1,26 @@
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) CCconfig        6)  ucx/1.14.1         11) flexiblas/3.3.1
+  2) gentoo/2023     7)  libfabric/1.18.0   12) blis/0.9.0
+  3) gcccore/.12.3   8)  pmix/4.2.4         13) StdEnv/2023
+  4) gcc/12.3        9)  ucc/1.2.0
+  5) hwloc/2.9.1     10) openmpi/4.1.5
+W0410 16:13:20.635000 806033 torch/utils/cpp_extension.py:546] The detected CUDA version (12.2) has a minor version mismatch with the version that was used to compile PyTorch (12.9). Most likely this shouldn't be a problem.
+CUDA extension for cauchy multiplication not found. Install by going to entensions/cauchy/ and running `python setup.py install`. This should speed up end-to-end training by 10-50%
+Falling back on slow Cauchy kernel. Install at least one of pykeops or the CUDA extension for efficiency.
+Traceback (most recent call last):
+  File "<stdin>", line 27, in <module>
+  File "/home/ghazalkh/3/SSSD/src/imputers/CSDIS4.py", line 2073, in train
+    train_loader, valid_loader, test_loader = get_dataloader_train_impute(
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghazalkh/3/SSSD/src/imputers/CSDIS4.py", line 1924, in get_dataloader_train_impute
+    train_dataset = Custom_Train_Dataset(series=series, use_index_list=tr_i,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghazalkh/3/SSSD/src/imputers/CSDIS4.py", line 1793, in __init__
+    observed_values, observed_masks, gt_masks = mask_missing_train_nrm(sample, missing_ratio_or_k)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghazalkh/3/SSSD/src/imputers/CSDIS4.py", line 1735, in mask_missing_train_nrm
+    gt_masks[:, channel][s_nan[0]:s_nan[-1] + 1] = 0
+                         ~~~~~^^^
+IndexError: index 0 is out of bounds for axis 0 with size 0

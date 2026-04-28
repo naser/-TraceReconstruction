@@ -1,0 +1,28 @@
+{
+  "dataset": "elk_clean",
+  "seq_len": 50,
+  "vocab_size": 59,
+  "oob_id": 60,
+  "split_method": "timestamp",
+  "n_train_events": 12237,
+  "n_test_events": 2500,
+  "n_train_seqs": 10000,
+  "n_test_seqs": 500,
+  "majority_baseline": {
+    "majority_token": 2,
+    "majority_accuracy": 34.55,
+    "majority_perfect_rate": 23.23
+  },
+  "phase": "clean",
+  "chunk_size": 500,
+  "test_every_nth_chunk": 5,
+  "trace_start_epoch_ns": -1688466846900298240,
+  "clean_boundary_s": 1200.0,
+  "noisy_boundary_s": 1860.0,
+  "clean_events": 14737,
+  "noisy_events": 426690,
+  "clean_rate_per_sec": 12.3,
+  "noisy_rate_per_sec": 646.5,
+  "stride_elk": 1,
+  "note": "Clean phase is intentionally sparse (~12 events/s = idle ELK queries). Dense stride-1 windowing extracts enough training windows from 14K events."
+}

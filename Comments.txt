@@ -1,0 +1,75 @@
+COMMENTS FOR THE AUTHOR:
+
+
+
+********
+
+Many thanks for submitting to the Empirical Software Engineering journal. Three experts have reviewed the manuscript and all recommended Major Revisions. The reviewers require the authors to (i) perform more in-depth experiments and evaluation, e.g., varying workload, downstream tasks, more realistic training data, more realistic scenarios for RQ5 and 6, analysis of computational overhead, qualitative error analysis, and (ii) address the scope and motivation gap (that can be done by possibly also performing more experiments). Based on the reviewers comments and recommendations, I would like to recommend a Major Revision. Please address each of the reviewer comments and prepare a letter that describes how each of the comments is addressed.
+
+
+Reviewer 1: This paper presents a thorough evaluation of diffusion-based models for reconstructing incomplete trace event sequences. It is well-structured and clearly written, effectively extending the authors' prior work at ICSE'25:
+- It advances the field beyond the prior work by introducing three new evaluation datasets and a transformer-based baseline model.
+- The research scope is systematically expanded to address model transferability and performance on diverse execution scenarios.
+- The overlap with the earlier conference paper is properly disclosed.
+
+There are two concerns to be addressed:
+1.      Scope & Motivation Gap: The introduction effectively highlights the importance of trace analysis in complex systems like microservices. However, the empirical work remains solely on OS system calls, creating a gap between the broader motivation and the specific experimental context.
+Suggestion: To fully address the motivating challenge, it would be compelling to include an evaluation on microservice trace datasets such as Alibaba Trace [1] and Meta Trace [2]. This would not only broaden the scope but also directly prove the method's applicability to a current, high-value problem domain, thereby increasing the paper's impact.
+[1] Luo, Shutian, et al. "Characterizing microservice dependency and performance: Alibaba trace analysis." Proceedings of the ACM symposium on cloud computing. 2021.
+[2] Huye, Darby, Yuri Shkuro, and Raja R. Sambasivan. "Lifting the veil on {Meta's} microservice architecture: Analyses of topology and request workflows." 2023 USENIX Annual Technical Conference (USENIX ATC 23). 2023.
+
+2.      Key Finding & Practical Limitation:
+The experiments for RQ5/RQ6 clearly indicate that accurate trace reconstruction is highly application-specific, and generalizability across applications is currently low. This creates a significant practical hurdle: deploying this approach for a new application would require a substantial volume of training data (~10k sequences as per the paper), which may not always be available, leading to a "cold-start" problem.
+
+Suggestions: Including an experiment to evaluate the reconstruction performance of diffusion-based models with varying sizes of training data. Additionally, it would be valuable to discuss potential approaches to improve model transferability in Section 4.6.2.
+
+
+
+Reviewer 2: This paper presents an study for reconstructing missing events in software execution traces by framing the problem as a time-series data imputation task. The authors propose the use of diffusion models to accurately infer and fill in gaps within missing trace sections. Compared to the conference version, this journal version expands the empirical evaluation from 9 to 12 datasets (including complex real-world systems like Apache, ELK, and PLAID), introduces a comparison against a state-of-the-art Transformer baseline (SAITS), and explores new research questions regarding cross-application transferability and multi-scenario training.
+
+While the paper provides an expanded evaluation of diffusion-based trace reconstruction compared with conference version, its practical value to software engineering practitioners is limited by the trivial nature of its transferability experiments, overhead anlysis, and lack of qualitative insights into failure modes.
+
+1) Trivial results in RQ5 and RQ6 (Transferability)
+While the addition of RQ5 and RQ6 expands the empirical evaluation, testing zero-shot transfer across entirely different domains (e.g., training on the iozone disk benchmark and testing on the apache web server) yields somewhat trivial negative results. Because these applications possess fundamentally different system call vocabularies and execution patterns, the performance degradation is expected certainly. To provide a more valuable contribution, I encourage the authors to augment or replace these experiments with more realistic software engineering scenarios, such as version-to-version transferability within the same application, or evaluating the effectiveness of transfer learning and fine-tuning.
+
+2) Missing analysis on computational overhead
+The paper positions this model as a practical tool for trace reconstruction, yet it completely omits an analysis of inference time. Diffusion models are known for computationally expensive due to their iterative denoising steps. If a software engineer needs to reconstruct a trace containing millions of events with thousands of gaps, the time required to run this model is a critical adoption factor. To establish practicality, the paper should report inference times and discuss the time efficiency of these model at scale.
+
+3) Lack of qualitative error analysis
+Despite the extensive quantitative evaluation (RQs 1-6), the paper lacks a qualitative analysis of reconstruction failures. The authors rely heavily on general metrics like ROUGE-L and Exact Accuracy. I suggest expanding the brief observation in Section 4.6.2 (e.g., predicting read instead of close) into a in-depth failure analysis. Illustrating what these mispredictions actually look like in trace reconstructions will help practitioners understand the failure types and contextual errors the model is most prone to.
+
+
+Minor
+-       Page 9, line 57: iit has been
+-       Page 11, line28: missing formatting on RQ6
+
+
+
+
+
+Reviewer 3: This paper investigates the use of diffusion-based generative models to reconstruct missing events in software execution traces. Execution traces are vital for tasks like security and performance analysis, but they often suffer from data loss due to buffer overflows. To address this, the authors evaluated four diffusion models across twelve datasets representing diverse system environments like the Apache Web Server and the ELK Stack. The study tested these models under various sequence lengths and missing data ratios.
+
+
+- Training data too good to be true and the approach is not designed for SE tasks
+- No evaluation on varying workload
+- No evaluation with downstream tasks
+
+
+One significant limitation of the proposed approach is that it is not specifically designed for software engineering data or tasks. Instead, the authors frame the problem as a general data imputation task, potentially overlooking the unique structural and semantic nuances inherent in software execution. By treating execution traces as generic sequences, the methodology misses the opportunity to incorporate domain-specific knowledge that could better guide the reconstruction process toward more meaningful results for software analysis.
+The evaluation fails to account for the impact of varying workloads. In many cases, similar workloads naturally generate similar traces, which can lead to an overestimation of the model's performance in a way that is not representative of real-world environments. In practice, there is always a high probability of encountering new or unpredictable workloads. Without evaluating the model's robustness against these shifts, it remains unclear how well the approach would generalize to the diverse and dynamic execution patterns found in production systems.
+
+To elaborate more on the above, RQ2 is supposed to clear this doubt however the experiments are not really down in a meaningful way. It's not clear whether those permutations are realistic or represent what's going on in real life. In fact, we don't even know whether the amount and characteristics of missing data in traces that is evaluated in this paper is representative in the real world at all. This would lead to my next comment.
+
+The training data itself also presents a concern, as it appears to be idealized and perhaps too good to be true. The models are trained on datasets with minimal missing information, which does not reflect the messy and incomplete nature of real-world data loss. The authors should at least motivate or try to illustrate in real-life how much missing data is typical and somehow let people know what's a typical scenario that would be faced. That should be first shown in a preliminary study.
+
+An idea to improve the current approach: A more practical and effective strategy would involve using a simple template supported by small, controlled experiments to guide the diffusion model's generation. This would provide the model with a more realistic and guided framework for reconstructing data rather than relying on near-perfect training baselines.
+
+Another major limitation involves the metrics used for evaluation, which do not align with what practitioners actually prioritize. Execution traces are primarily valuable when issues or bugs occur, meaning that the vast majority of correctly reconstructed normal traces are essentially useless. Measuring success based on overall reconstruction accuracy is therefore insufficient, as the importance of a trace is disproportionately tied to the rare moments of system failure rather than the bulk of routine execution.
+
+Finally, and I think this is a rather important concern, the evaluation neglects the importance of downstream tasks. A reconstruction is only truly successful if it preserves the integrity of the subsequent analysis, such as fault localization or performance monitoring. Even a very small error—like missing a single critical system call—can render the entire downstream analysis incorrect and the reconstructed trace useless. To be meaningful, the effectiveness of the reconstruction should be measured by its impact on the actual tasks that developers and operators need to perform, rather than just statistical accuracy.
+
+RQ4 is done in a problematic manner. The groups of events have no grounds. Why do people care this? Why not measure on different distinct events?
+RQ5 is rather expected and this is not useful in practice. No one would expect you can train a model from one subject of traces and predict that entirely in another. Likely mentioned above, varying workload is more meaningful.
+RQ6 is not formatted correctly! Someone needs to carefully read the paper before submitting for review.
+This is also not in the right format of EMSE.
+The threats section is not boiler plated without actual thinking on the threats. For example, if you are a developer, why would you care if your model can generalize other subjects as an external threat? This paragraph is just put on there for show.

@@ -1,0 +1,156 @@
+{
+  "experiment": "RQ-W: Varying-Workload Robustness",
+  "model": "SSSD^S4",
+  "seq_len": 200,
+  "blackout_k": 10,
+  "masking": "cm (centered)",
+  "train_iters": 10000,
+  "conditions": [
+    {
+      "condition": "elk-clean-baseline",
+      "train": "elk_clean",
+      "test": "elk_clean",
+      "family": "ELK",
+      "metrics": null
+    },
+    {
+      "condition": "elk-noisy-baseline",
+      "train": "elk_noisy",
+      "test": "elk_noisy",
+      "family": "ELK",
+      "metrics": null
+    },
+    {
+      "condition": "elk-clean-to-noisy",
+      "train": "elk_clean",
+      "test": "elk_noisy",
+      "family": "ELK",
+      "metrics": null
+    },
+    {
+      "condition": "elk-noisy-to-clean",
+      "train": "elk_noisy",
+      "test": "elk_clean",
+      "family": "ELK",
+      "metrics": null
+    },
+    {
+      "condition": "pts-stream-baseline",
+      "train": "stream",
+      "test": "stream",
+      "family": "PTS-mem",
+      "metrics": {
+        "accuracy": 82.8,
+        "perfect_rate": 76.0,
+        "rouge_l": 84.7,
+        "n_sequences": 500,
+        "source": "existing_results"
+      }
+    },
+    {
+      "condition": "pts-ramspeed-baseline",
+      "train": "ramspeed",
+      "test": "ramspeed",
+      "family": "PTS-mem",
+      "metrics": {
+        "accuracy": 82.58,
+        "perfect_rate": 76.4,
+        "rouge_l": 84.5,
+        "n_sequences": 500,
+        "source": "existing_results"
+      }
+    },
+    {
+      "condition": "pts-stream-to-ramspeed",
+      "train": "stream",
+      "test": "ramspeed",
+      "family": "PTS-mem",
+      "metrics": null
+    },
+    {
+      "condition": "pts-ramspeed-to-stream",
+      "train": "ramspeed",
+      "test": "stream",
+      "family": "PTS-mem",
+      "metrics": null
+    },
+    {
+      "condition": "pts-pybench-baseline",
+      "train": "pybench",
+      "test": "pybench",
+      "family": "PTS-cpu",
+      "metrics": {
+        "accuracy": 78.14,
+        "perfect_rate": 69.0,
+        "rouge_l": 80.18,
+        "n_sequences": 500,
+        "source": "existing_results"
+      }
+    },
+    {
+      "condition": "pts-phpbench-baseline",
+      "train": "phpbench",
+      "test": "phpbench",
+      "family": "PTS-cpu",
+      "metrics": {
+        "accuracy": 77.44,
+        "perfect_rate": 68.4,
+        "rouge_l": 80.16,
+        "n_sequences": 500,
+        "source": "existing_results"
+      }
+    },
+    {
+      "condition": "pts-pybench-to-phpbench",
+      "train": "pybench",
+      "test": "phpbench",
+      "family": "PTS-cpu",
+      "metrics": null
+    },
+    {
+      "condition": "pts-phpbench-to-pybench",
+      "train": "phpbench",
+      "test": "pybench",
+      "family": "PTS-cpu",
+      "metrics": null
+    }
+  ],
+  "degradation": [
+    {
+      "pair": "ELK: clean\u2192noisy  (A\u2192B)",
+      "acc_deg": "PENDING",
+      "pr_deg": "PENDING",
+      "rl_deg": "PENDING"
+    },
+    {
+      "pair": "ELK: noisy\u2192clean  (B\u2192A)",
+      "acc_deg": "PENDING",
+      "pr_deg": "PENDING",
+      "rl_deg": "PENDING"
+    },
+    {
+      "pair": "PTS-mem: stream\u2192ramspeed",
+      "acc_deg": "PENDING",
+      "pr_deg": "PENDING",
+      "rl_deg": "PENDING"
+    },
+    {
+      "pair": "PTS-mem: ramspeed\u2192stream",
+      "acc_deg": "PENDING",
+      "pr_deg": "PENDING",
+      "rl_deg": "PENDING"
+    },
+    {
+      "pair": "PTS-cpu: pybench\u2192phpbench",
+      "acc_deg": "PENDING",
+      "pr_deg": "PENDING",
+      "rl_deg": "PENDING"
+    },
+    {
+      "pair": "PTS-cpu: phpbench\u2192pybench",
+      "acc_deg": "PENDING",
+      "pr_deg": "PENDING",
+      "rl_deg": "PENDING"
+    }
+  ]
+}

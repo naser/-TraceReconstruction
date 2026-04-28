@@ -1,0 +1,9 @@
+{
+  "source_dataset": "phpbench_sharedcpu",
+  "n_train": 1000,
+  "n_train_source": 10000,
+  "seq_len": 200,
+  "random_seed": 42,
+  "subsampling_method": "uniform_random_without_replacement",
+  "experiment": "cold-start"
+}

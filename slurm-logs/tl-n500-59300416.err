@@ -1,0 +1,21 @@
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) CCconfig        6)  ucx/1.14.1         11) flexiblas/3.3.1
+  2) gentoo/2023     7)  libfabric/1.18.0   12) blis/0.9.0
+  3) gcccore/.12.3   8)  pmix/4.2.4         13) StdEnv/2023
+  4) gcc/12.3        9)  ucc/1.2.0
+  5) hwloc/2.9.1     10) openmpi/4.1.5
+W0413 17:18:31.858000 3391413 torch/utils/cpp_extension.py:546] The detected CUDA version (12.2) has a minor version mismatch with the version that was used to compile PyTorch (12.9). Most likely this shouldn't be a problem.
+CUDA extension for cauchy multiplication not found. Install by going to entensions/cauchy/ and running `python setup.py install`. This should speed up end-to-end training by 10-50%
+Falling back on slow Cauchy kernel. Install at least one of pykeops or the CUDA extension for efficiency.
+/localscratch/ghazalkh.59300416.0/venv/lib/python3.11/site-packages/torch/nn/utils/weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)
+/localscratch/ghazalkh.59300416.0/venv/lib/python3.11/site-packages/torch/nn/utils/weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)
+CUDA extension for cauchy multiplication not found. Install by going to entensions/cauchy/ and running `python setup.py install`. This should speed up end-to-end training by 10-50%
+Falling back on slow Cauchy kernel. Install at least one of pykeops or the CUDA extension for efficiency.
+/localscratch/ghazalkh.59300416.0/venv/lib/python3.11/site-packages/torch/nn/utils/weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)
+/localscratch/ghazalkh.59300416.0/venv/lib/python3.11/site-packages/torch/nn/utils/weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)

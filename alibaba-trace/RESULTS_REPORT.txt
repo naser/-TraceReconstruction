@@ -1,0 +1,126 @@
+================================================================================
+  ALIBABA MICROSERVICE TRACE — EXPERIMENT RESULTS REPORT
+  Addressing Reviewer 1 Comment 1: Scope & Motivation Gap
+  EMSE Submission
+  Run date: April 10, 2026  |  Cluster: Narval (Alliance Canada)
+  Split: random trace-level 80/20 (seed 42)  — v2 rerun (jobs 59202165–59202170)
+================================================================================
+
+
+1. OVERVIEW
+────────────
+This report presents results of extending the trace reconstruction evaluation
+to the Alibaba 2021 Microservice Trace dataset, demonstrating that the
+diffusion-based approach transfers to a microservice call-graph setting in
+addition to the 12 OS system-call datasets already in the paper.
+
+The key difference from syscall datasets is vocabulary size: Alibaba has
+7,377 distinct <rpctype>:<dm> call types versus 87–108 syscalls per benchmark.
+Accuracy is correspondingly lower, but all diffusion models remain substantially
+above the random baseline (0.014%) and above the SAITS transformer baseline,
+consistent with the paper's model-comparison findings.
+
+Split methodology (v2, corrected): Traces are randomly shuffled (seed 42) and
+split 80/20 at trace granularity so that no individual trace spans the train/test
+boundary. The previous temporal 80/20 event-position split concentrated the test
+set in the final hours of the 12-hour trace, where a handful of dominant call
+types created an artificially skewed test distribution; that artefact is
+eliminated in this rerun.
+
+
+2. DATASET
+──────────
+Name          : Alibaba 2021 Microservice Trace (MSCallGraph)
+Source        : Luo et al., "Characterizing Microservice Dependency and
+                Performance: Alibaba Trace Analysis." ACM SoCC 2021.
+Raw data file : alibaba-trace/raw/MSCallGraph_0.csv  (1.3 GB)
+Coverage      : 12 hours of production traffic, ~20,000 microservices
+Total records : 6,088,846 call events  |  Unique traces: 130,512
+Vocabulary    : 7,377 distinct <rpctype>:<dm> tokens
+Split (v2)    : Random trace-level 80/20 (seed 42); ~104,410 train traces /
+                ~26,102 test traces.  No trace crosses the split boundary.
+
+
+3. MODELS AND CONFIGURATION
+────────────────────────────
+All models use the same hyperparameters as in the paper:
+
+  Model       Iters / Epochs    LR      Masking    seq  k
+  ─────────────────────────────────────────────────────────
+  DiffWave    10,000            2e-4    Centered   200  10
+  SSSD^SA     10,000            2e-4    Centered   200  10
+  SSSD^S4     10,000            2e-4    Centered   200  10
+  SAITS          200 ep         1e-3    Centered   200  10
+
+Hardware: NVIDIA A100, 32 GB (Narval, Alliance Canada).
+
+
+4. RESULTS — MODEL COMPARISON (seq=200, blackout=10)
+──────────────────────────────────────────────────────
+v2 rerun with random trace-level split (seed 42).  All jobs completed
+2026-04-10 (jobs 59202165–59202170).
+
+  Model       Accuracy    Perfect Rate    ROUGE-L    N
+  ──────────────────────────────────────────────────────
+  SSSD^SA     10.08 %      3.40 %         12.78     500
+  DiffWave     9.32 %      3.40 %         11.20     500
+  SSSD^S4      7.18 %      1.00 %          9.96     500
+  SAITS        6.74 %      0.40 %         11.98     500
+
+On the 12 OS syscall datasets in the main paper, the best diffusion model
+achieves 53–99% accuracy; the lower values here (7–10%) directly reflect the
+51–85× larger vocabulary (7,377 microservice call types vs. 87–140 syscalls).
+
+Key observations:
+  • All three diffusion models outperform SAITS (6.74% accuracy), consistent
+    with the paper's RQ3 finding across all 12 existing datasets.
+  • SSSD^SA leads at 10.08% accuracy and 12.78 ROUGE-L; DiffWave is close
+    behind at 9.32% / 11.20; SSSD^S4 follows at 7.18% / 9.96.
+  • All four models are well above the random baseline (0.014% = 1/7,377):
+    SSSD^SA is ~720× random, DiffWave ~666×, SSSD^S4 ~513×, SAITS ~481×.
+  • SAITS achieves 11.98 ROUGE-L despite lower accuracy (6.74%), indicating
+    it recovers more partial sub-sequence structure on this high-cardinality
+    vocabulary than its exact-match score suggests.
+  • SAITS val_MAE remained ~97–99 throughout 200 training epochs (best: 96.67),
+    consistent with the transformer struggling on the sparse, high-cardinality
+    microservice token space.
+
+NOTE ON PREVIOUS ANOMALY: The original v1 run (temporal 80/20 event-position
+split) produced a spurious SSSD^S4 result of 99.64% for seq=200, k=10.
+Root cause: the split boundary landed in a region of the 12-hour Alibaba trace
+where token ID 1 accounted for 1,249 of 1,250 blackout positions; the model
+trivially predicted the dominant token.  The v2 random trace-level split
+eliminates this artefact; SSSD^S4 now correctly measures at 7.18%.
+The v1 result is not used anywhere in this report.
+
+
+5. CROSS-APPLICATION TRANSFER (from initial run)
+──────────────────────────────────────────────────
+Model: SSSD^S4, seq=200, blackout=10.  Train → test across dataset domains.
+
+  Train → Test        Accuracy    Perfect Rate    ROUGE-L
+  ────────────────────────────────────────────────────────
+  alibaba → apache      2.74 %      0.00 %          9.42
+  alibaba → plaid       3.28 %      0.00 %          9.94
+  alibaba → elk         1.90 %      0.00 %          6.20
+  apache  → alibaba     2.74 %      0.00 %          9.42
+  plaid   → alibaba     3.28 %      0.00 %          9.94
+  elk     → alibaba     1.90 %      0.00 %          6.20
+
+Near-zero cross-domain accuracy (avg 2.64%, 0.00% perfect rate) extends the
+paper's RQ5 finding to the syscall-vs-microservice boundary: the token
+vocabularies are entirely disjoint, so zero-shot transfer is not feasible.
+This is consistent with the paper's cross-application results (~0–5% across
+the 12 existing datasets) and confirms that domain-specific training data is
+required for both syscall and microservice settings.
+
+
+6. RESOURCE USAGE
+──────────────────
+Total GPU-hours (v2 rerun): ~4 h across 4 training jobs on Narval A100.
+Results stored: $SCRATCH/alibaba-trace-results-v2/
+
+
+================================================================================
+END OF REPORT
+================================================================================

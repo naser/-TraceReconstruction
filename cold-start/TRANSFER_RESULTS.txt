@@ -1,0 +1,112 @@
+============================================================================
+  RQ-TL: Realistic Transfer-Learning Experiment  [ADDED]
+============================================================================
+  FRAMING: This is a NEW added experiment, NOT a reframing of RQ5/RQ6.
+    RQ5 (current paper): zero-shot cross-application transfer.
+    RQ6 (current paper): one model trained on multiple apps simultaneously.
+    RQ-TL (new):         pretrain on related source, fine-tune on small target.
+
+  Source (pretrain) : pybench_sharedcpu  (full 10000 seqs, 84-token shared vocab)
+  Target (fine-tune): phpbench_sharedcpu
+  Seq len : 200   Blackout k: 10   Masking: center (cm)
+  Fine-tune init    : warm-start (source 10000.pkl weights, reset optimizer)
+  Fine-tune iters   : 10 000  (equal budget to scratch training)
+
+  METHODOLOGICAL NOTE — Shared vocabulary
+  ────────────────────────────────────────
+  Both pybench_sharedcpu and phpbench_sharedcpu use a SHARED
+  84-token CPU-benchmark vocabulary built by
+  varying-workload/preprocess_pts_shared_vocab.py.
+  The paper's default preprocessing (§III-B) assigns each dataset
+  its own frequency-ranked vocabulary.  The shared vocabulary is a
+  deliberate and necessary deviation: without it the pretrained
+  embedding weights would encode different syscalls on source vs
+  target, making warm-start weights meaningless.  Disclose this in
+  any paper text.
+
+  Research question (added): Does pre-training on a RELATED trace
+  source reduce the number of TARGET sequences needed for high
+  reconstruction quality?
+
+
+────────────────────────────────────────────────────────────────────────────
+  SCRATCH vs FINE-TUNED COMPARISON TABLE
+────────────────────────────────────────────────────────────────────────────
+ N_train  ──────── Scratch ────────   ──── Fine-tuned (TL) ────    Δ Acc
+              Acc    Perf   ROUGE      Acc    Perf   ROUGE   ft−sc
+----------------------------------------------------------------------------
+     100    79.58   49.00   83.88    90.72   73.00   91.96  +11.14 
+     500    91.46   78.80   92.60    93.70   86.80   94.30  +2.24  
+    1000    89.02   67.00   89.82    94.66   89.60   95.12  +5.64  
+    2500    91.26   77.20   92.06    91.10   78.00   91.84  -0.16  
+    5000    90.60   78.80   91.34    94.60   90.20   95.12  +4.00  
+----------------------------------------------------------------------------
+   10000    89.14   72.60   90.12    [ref]   [ref]   [ref]       —  ← RQ-W full-data baseline
+
+  Δ Acc: positive = fine-tuning helps; negative = scratch is better
+
+────────────────────────────────────────────────────────────────────────────
+  FINE-TUNING BENEFIT CURVE  (Accuracy % vs Training Size)
+────────────────────────────────────────────────────────────────────────────
+       N   Scratch   Fine-tuned       Δ
+  ------  --------  -----------  ------
+     100     79.58%       90.72%  +11.14
+     500     91.46%       93.70%   +2.24
+    1000     89.02%       94.66%   +5.64
+    2500     91.26%       91.10%   -0.16
+    5000     90.60%       94.60%   +4.00
+   10000     89.14%        [ref]       —  ← RQ-W full-data
+
+────────────────────────────────────────────────────────────────────────────
+  COLD-START MULTIPLIER ANALYSIS
+────────────────────────────────────────────────────────────────────────────
+  'With N fine-tuned sequences, the model matches scratch at M sequences.'
+  A high multiplier = pretraining is especially beneficial in low-data regime.
+
+  Fine-tune N=  100 (90.72% acc) ≈ scratch N=  500 (91.46% acc)  → 5.0× multiplier
+  Fine-tune N=  500 (93.70% acc) exceeds all tested scratch sizes.
+  Fine-tune N= 1000 (94.66% acc) exceeds all tested scratch sizes.
+  Fine-tune N= 2500 (91.10% acc) ≈ scratch N=  500 (91.46% acc)  → 0.2× multiplier
+  Fine-tune N= 5000 (94.60% acc) exceeds all tested scratch sizes.
+
+  Higher multiplier = bigger benefit from pretraining.
+  A multiplier > 1 confirms that fine-tuning is especially
+  useful in the cold-start (very low data) regime.
+
+────────────────────────────────────────────────────────────────────────────
+  GAP TO FULL-DATA REFERENCE  (N=10k, pts-phpbench-baseline from RQ-W)
+────────────────────────────────────────────────────────────────────────────
+   N_train   Scratch Δ vs 10k    Fine-tune Δ vs 10k
+----------------------------------------------------------------------------
+       100              -9.56                 +1.58
+       500              +2.32                 +4.56
+      1000              -0.12                 +5.52
+      2500              +2.12                 +1.96
+      5000              +1.46                 +5.46
+
+  Full-data (N=10k) reference: acc=89.14%  perf=72.60%  rouge=90.12%
+  Negative Δ = the small-data model runs below full-data performance.
+
+────────────────────────────────────────────────────────────────────────────
+  RAW METRICS  (from metrics.json files)
+────────────────────────────────────────────────────────────────────────────
+  N=100
+    scratch  : acc=79.58  perf=49.0  rouge=83.88  n_seq=500
+    finetune : acc=90.72  perf=73.0  rouge=91.96  n_seq=500
+  N=500
+    scratch  : acc=91.46  perf=78.8  rouge=92.6  n_seq=500
+    finetune : acc=93.7  perf=86.8  rouge=94.3  n_seq=500
+  N=1000
+    scratch  : acc=89.02  perf=67.0  rouge=89.82  n_seq=500
+    finetune : acc=94.66  perf=89.6  rouge=95.12  n_seq=500
+  N=2500
+    scratch  : acc=91.26  perf=77.2  rouge=92.06  n_seq=500
+    finetune : acc=91.1  perf=78.0  rouge=91.84  n_seq=500
+  N=5000
+    scratch  : acc=90.6  perf=78.8  rouge=91.34  n_seq=500
+    finetune : acc=94.6  perf=90.2  rouge=95.12  n_seq=500
+
+  N=10000 (ref, RQ-W pts-phpbench-baseline):
+    acc=89.14  perf=72.6  rouge=90.12  n_seq=500
+
+============================================================================

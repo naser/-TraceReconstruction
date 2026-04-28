@@ -1,0 +1,76 @@
+# ─── Raw and large data files ────────────────────────────────────────────────
+apache-raw/
+elk-extracted/
+alibaba-trace/raw/
+
+# ─── Derived large text files (generated from raw data) ──────────────────────
+alibaba_calls.txt
+
+# ─── Binary dataset / result files ──────────────────────────────────────────
+*.npy
+*.npz
+*.pkl
+*.h5
+*.hdf5
+
+# ─── Archives ────────────────────────────────────────────────────────────────
+*.zip
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+
+# ─── Paper LaTeX source ──────────────────────────────────────────────────────
+paper/
+
+# ─── Python artifacts ────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.env
+.venv
+venv/
+env/
+
+# ─── Jupyter ─────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ─── Editor and OS ───────────────────────────────────────────────────────────
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+Thumbs.db
+
+# ─── LaTeX build artifacts (in subdirectories) ───────────────────────────────
+*.aux
+*.log
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.out
+*.toc
+*.bbl
+*.blg
+*.lof
+*.lot
+
+# ─── Individual SLURM stdout files at project root ──────────────────────────
+slurm-*.out
+
+# ─── Trained model checkpoints (large) ──────────────────────────────────────
+*.pt
+*.pth
+*.ckpt
+checkpoints/
+saved_models/
+
+# ─── NNI tuning artifacts ────────────────────────────────────────────────────
+SAITS/NNI_tuning/nni-experiments/

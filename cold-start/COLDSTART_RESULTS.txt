@@ -1,0 +1,83 @@
+========================================================================
+  RQ-CS: Training-Data-Size / Cold-Start Experiment  [ADDED]
+========================================================================
+  Model      : SSSD^S4 (best model, paper §IV)
+  Dataset    : phpbench_sharedcpu  (84-token shared CPU-benchmark vocab)
+  Seq len    : 200   Blackout k: 10   Masking: center (cm)
+  Paper default: seq=200, k=10, masking=cm, T=200 diffusion steps
+  Subsampling: uniform random without replacement (seed=42)
+
+  METHODOLOGICAL NOTE — Shared vocabulary
+  ────────────────────────────────────────
+  phpbench_sharedcpu uses a SHARED 84-token vocabulary built across
+  pybench_sharedcpu + phpbench_sharedcpu by
+  varying-workload/preprocess_pts_shared_vocab.py.
+  The paper's default preprocessing (§III-B) assigns each dataset
+  its own frequency-ranked vocabulary.  The shared vocabulary is
+  required for cross-size comparability and for the transfer-learning
+  experiment (RQ-TL).  Disclose this deviation in any paper text.
+
+
+────────────────────────────────────────────────────────────────────────
+  SAMPLE-EFFICIENCY TABLE  (scratch training from random init)
+────────────────────────────────────────────────────────────────────────
+ N_train   Accuracy   PerfRate    ROUGE-L    ΔAcc↑   ΔPerf↑  ΔRouge↑
+                (%)        (%)        (%)   vs 10k   vs 10k   vs 10k
+------------------------------------------------------------------------
+     100      79.58      49.00      83.88    -9.56   -23.60    -6.24
+     500      91.46      78.80      92.60    +2.32    +6.20    +2.48
+    1000      89.02      67.00      89.82    -0.12    -5.60    -0.30
+    2500      91.26      77.20      92.06    +2.12    +4.60    +1.94
+    5000      90.60      78.80      91.34    +1.46    +6.20    +1.22
+   10000      89.14      72.60      90.12      ≈0       ≈0       ≈0   ← reference (RQ-W)
+
+
+────────────────────────────────────────────────────────────────────────
+  SAMPLE-EFFICIENCY CURVE  (Accuracy % vs Training Size)
+────────────────────────────────────────────────────────────────────────
+     100  ███████████████████████████████████       79.58%
+     500  ████████████████████████████████████████  91.46%
+    1000  ███████████████████████████████████████   89.02%
+    2500  ████████████████████████████████████████  91.26%
+    5000  ████████████████████████████████████████  90.60%
+   10000  ███████████████████████████████████████   89.14%
+
+  Interpretation:
+  • The curve shows how quickly SSSD^S4 saturates as training
+    data grows.  A steep rise at small N indicates the model
+    can learn useful patterns with few sequences (good for
+    cold-start scenarios).  A flat tail at large N means
+    performance is data-efficient and collection of large
+    datasets is not required.
+
+────────────────────────────────────────────────────────────────────────
+  MINIMUM-VIABLE-TRAINING-SIZE ANALYSIS
+────────────────────────────────────────────────────────────────────────
+   90% of full-data accuracy (80.23%) reached at N=500  (acc=91.46%)
+   95% of full-data accuracy (84.68%) reached at N=500  (acc=91.46%)
+   99% of full-data accuracy (88.25%) reached at N=500  (acc=91.46%)
+
+
+────────────────────────────────────────────────────────────────────────
+  RAW METRICS  (from metrics.json files)
+────────────────────────────────────────────────────────────────────────
+  N=100
+    dir  : /scratch/ghazalkh/cold-start-results/SSSDS4/phpbench_sharedcpu_n100_to_phpbench_sharedcpu_seq200_k10/T200_beta00.0001_betaT0.02
+    acc=79.58  perf=49.0  rouge=83.88  n_seq=500
+  N=500
+    dir  : /scratch/ghazalkh/cold-start-results/SSSDS4/phpbench_sharedcpu_n500_to_phpbench_sharedcpu_seq200_k10/T200_beta00.0001_betaT0.02
+    acc=91.46  perf=78.8  rouge=92.6  n_seq=500
+  N=1000
+    dir  : /scratch/ghazalkh/cold-start-results/SSSDS4/phpbench_sharedcpu_n1000_to_phpbench_sharedcpu_seq200_k10/T200_beta00.0001_betaT0.02
+    acc=89.02  perf=67.0  rouge=89.82  n_seq=500
+  N=2500
+    dir  : /scratch/ghazalkh/cold-start-results/SSSDS4/phpbench_sharedcpu_n2500_to_phpbench_sharedcpu_seq200_k10/T200_beta00.0001_betaT0.02
+    acc=91.26  perf=77.2  rouge=92.06  n_seq=500
+  N=5000
+    dir  : /scratch/ghazalkh/cold-start-results/SSSDS4/phpbench_sharedcpu_n5000_to_phpbench_sharedcpu_seq200_k10/T200_beta00.0001_betaT0.02
+    acc=90.6  perf=78.8  rouge=91.34  n_seq=500
+  N=10000
+    dir  : /scratch/ghazalkh/varying-workload-results/SSSDS4/phpbench_sharedcpu_seq200_k10/T200_beta00.0001_betaT0.02
+    acc=89.14  perf=72.6  rouge=90.12  n_seq=500
+
+========================================================================

@@ -1,0 +1,109 @@
+==============================================================================
+  RQ-W VARYING-WORKLOAD RESULTS  (auto-generated)
+  seq_len=200  blackout_k=10
+  results_base: /scratch/ghazalkh/varying-workload-results
+==============================================================================
+
+══════════════════════════════════════════════════════════════════════════════
+  SANITY CHECKS (TEST_DS verification)
+──────────────────────────────────────────────────────────────────────────────
+  ⚠  elk-clean-to-noisy: MISMATCH: original*.npy != test.npy[:n_inf]. First diff at seq=11 pos=108: got 5 expected 1. Check that inference used TEST_DS='elk_noisy' data.
+
+
+══════════════════════════════════════════════════════════════════════════════
+  ELK Workload
+──────────────────────────────────────────────────────────────────────────────
+Condition                         Acc%  PerfR%  ROUGER     N  Majority%
+------------------------------------------------------------------------------
+  elk-clean-baseline             24.76    3.80   34.66   500       38.3
+  elk-noisy-baseline            100.00  100.00  100.00   500       99.5
+→ elk-clean-to-noisy             99.54   98.68   99.60   302       99.5 ⚠
+→ elk-noisy-to-clean             10.42    0.20   15.04   500       38.3
+
+
+══════════════════════════════════════════════════════════════════════════════
+  PTS Memory-Bandwidth
+──────────────────────────────────────────────────────────────────────────────
+Condition                         Acc%  PerfR%  ROUGER     N  Majority%
+------------------------------------------------------------------------------
+  pts-stream-baseline            80.76   72.60   82.50   500          ?
+  pts-ramspeed-baseline          36.26   21.80   41.06   500          ?
+→ pts-stream-to-ramspeed         37.78   23.00   42.46   500          ?
+→ pts-ramspeed-to-stream         78.32   69.80   80.44   500          ?
+
+
+══════════════════════════════════════════════════════════════════════════════
+  PTS CPU-Benchmark
+──────────────────────────────────────────────────────────────────────────────
+Condition                         Acc%  PerfR%  ROUGER     N  Majority%
+------------------------------------------------------------------------------
+  pts-pybench-baseline           64.80   52.80   68.80   500          ?
+  pts-phpbench-baseline          89.14   72.60   90.12   500          ?
+→ pts-pybench-to-phpbench        91.90   85.80   92.20   500          ?
+→ pts-phpbench-to-pybench        56.64   34.80   62.80   500          ?
+
+
+══════════════════════════════════════════════════════════════════════════════
+  CROSS-WORKLOAD DEGRADATION (Baseline − Cross; positive = worse)
+──────────────────────────────────────────────────────────────────────────────
+Transfer pair                       Acc Δ  PerfR Δ  ROUGE Δ  Baseline
+------------------------------------------------------------------------------
+  elk-clean-to-noisy              +0.46    +1.32    +0.40    ← elk-noisy-baseline
+  elk-noisy-to-clean              +14.34   +3.60    +19.62   ← elk-clean-baseline
+  pts-stream-to-ramspeed          -1.52    -1.20    -1.40    ← pts-ramspeed-baseline
+  pts-ramspeed-to-stream          +2.44    +2.80    +2.06    ← pts-stream-baseline
+  pts-pybench-to-phpbench         -2.76    -13.20   -2.08    ← pts-phpbench-baseline
+  pts-phpbench-to-pybench         +8.16    +18.00   +6.00    ← pts-pybench-baseline
+
+  Note: positive Δ = cross-workload condition is WORSE than baseline.
+        negative Δ = cross-workload is BETTER than baseline.
+
+  ELK note: The ELK split uses an event-count fraction fallback (not
+  real timestamps) because the clean phase generates only ~12 events/s
+  vs stress-ng's ~646 events/s. The ELK majority baselines are already
+  ≥98% due to the noisy phase dominating token frequency; model accuracy
+  should be compared primarily against this majority baseline, and ELK
+  treated as supporting evidence rather than the headline cross-workload
+  result. Headlines should come from the PTS shared-vocab experiments.
+
+══════════════════════════════════════════════════════════════════════════════
+  RAW METRICS (from metrics.json files)
+──────────────────────────────────────────────────────────────────────────────
+  elk-clean-baseline
+    dir  : /scratch/ghazalkh/varying-workload-results/SSSDS4/elk_clean_seq200_k10/T200_beta00.0001_betaT0.02
+    acc  : 24.76  perf: 3.8  rouge: 34.66  n=500
+  elk-noisy-baseline
+    dir  : /scratch/ghazalkh/varying-workload-results/SSSDS4/elk_noisy_seq200_k10/T200_beta00.0001_betaT0.02
+    acc  : 100.0  perf: 100.0  rouge: 100.0  n=500
+  elk-clean-to-noisy
+    dir  : /scratch/ghazalkh/varying-workload-results/SSSDS4/elk_clean_to_elk_noisy_seq200_k10/T200_beta00.0001_betaT0.02
+    acc  : 99.54  perf: 98.68  rouge: 99.6  n=302
+  elk-noisy-to-clean
+    dir  : /scratch/ghazalkh/varying-workload-results/SSSDS4/elk_noisy_to_elk_clean_seq200_k10/T200_beta00.0001_betaT0.02
+    acc  : 10.42  perf: 0.2  rouge: 15.04  n=500
+  pts-stream-baseline
+    dir  : /scratch/ghazalkh/varying-workload-results/SSSDS4/stream_sharedmem_seq200_k10/T200_beta00.0001_betaT0.02
+    acc  : 80.76  perf: 72.6  rouge: 82.5  n=500
+  pts-ramspeed-baseline
+    dir  : /scratch/ghazalkh/varying-workload-results/SSSDS4/ramspeed_sharedmem_seq200_k10/T200_beta00.0001_betaT0.02
+    acc  : 36.26  perf: 21.8  rouge: 41.06  n=500
+  pts-stream-to-ramspeed
+    dir  : /scratch/ghazalkh/varying-workload-results/SSSDS4/stream_sharedmem_to_ramspeed_sharedmem_seq200_k10/T200_beta00.0001_betaT0.02
+    acc  : 37.78  perf: 23.0  rouge: 42.46  n=500
+  pts-ramspeed-to-stream
+    dir  : /scratch/ghazalkh/varying-workload-results/SSSDS4/ramspeed_sharedmem_to_stream_sharedmem_seq200_k10/T200_beta00.0001_betaT0.02
+    acc  : 78.32  perf: 69.8  rouge: 80.44  n=500
+  pts-pybench-baseline
+    dir  : /scratch/ghazalkh/varying-workload-results/SSSDS4/pybench_sharedcpu_seq200_k10/T200_beta00.0001_betaT0.02
+    acc  : 64.8  perf: 52.8  rouge: 68.8  n=500
+  pts-phpbench-baseline
+    dir  : /scratch/ghazalkh/varying-workload-results/SSSDS4/phpbench_sharedcpu_seq200_k10/T200_beta00.0001_betaT0.02
+    acc  : 89.14  perf: 72.6  rouge: 90.12  n=500
+  pts-pybench-to-phpbench
+    dir  : /scratch/ghazalkh/varying-workload-results/SSSDS4/pybench_sharedcpu_to_phpbench_sharedcpu_seq200_k10/T200_beta00.0001_betaT0.02
+    acc  : 91.9  perf: 85.8  rouge: 92.2  n=500
+  pts-phpbench-to-pybench
+    dir  : /scratch/ghazalkh/varying-workload-results/SSSDS4/phpbench_sharedcpu_to_pybench_sharedcpu_seq200_k10/T200_beta00.0001_betaT0.02
+    acc  : 56.64  perf: 34.8  rouge: 62.8  n=500
+
+==============================================================================
